@@ -106,6 +106,17 @@ const App = () => {
       <WebView
         ref={webViewRef}
         source={{uri: 'https://google.com'}}
+        injectedJavaScript={`
+        window.onload = () => {
+          (function() {
+            window.ReactNativeWebView.postMessage(JSON.stringify({method: "asd", data: {A:1,B:"asd"}}))
+          })()
+        }
+        
+        `}
+        onMessage={event => {
+          console.log(JSON.parse(event.nativeEvent.data));
+        }}
         onContentProcessDidTerminate={syntheticEvent => {
           const {nativeEvent} = syntheticEvent;
           console.warn('Content process terminated, reloading', nativeEvent);
