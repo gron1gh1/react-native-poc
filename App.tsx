@@ -24,7 +24,7 @@ const Stack = createNativeStackNavigator();
 
 type RootStackParamList = {
   Home: undefined;
-  Webview: undefined;
+  Webview: {url: string};
 };
 type ActivityProps = NativeStackScreenProps<
   RootStackParamList,
@@ -38,12 +38,14 @@ function HomeScreen({navigation}: ActivityProps) {
       <Text>Home Screen</Text>
       <Button
         title="Go to Details"
-        onPress={() => navigation.navigate('Webview')}
+        onPress={() =>
+          navigation.navigate('Webview', {url: 'http://google.com'})
+        }
       />
     </View>
   );
 }
-function WebviewScreen({navigation}: ActivityProps) {
+function WebviewScreen({navigation, route}: ActivityProps) {
   const webViewRef = React.useRef<WebView>(null);
 
   const html = `
@@ -69,8 +71,8 @@ function WebviewScreen({navigation}: ActivityProps) {
         window.ReactNativeWebView.postMessage(JSON.stringify({method:"navigate", data:{name:'Home'}}))
       }
 
-      function push() {
-        window.ReactNativeWebView.postMessage(JSON.stringify({method:"push", data:{name:'Webview'}}))
+      function push(url) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({method:"push", data:{name:'Webview',params: {url}}}))
       }
 
         </script>
@@ -81,7 +83,9 @@ function WebviewScreen({navigation}: ActivityProps) {
 
         <button onclick="navigate()">홈</button>
         
-        <button onclick="push()">푸시</button>
+        <button onclick="push('')">푸시</button>
+        
+        <button onclick="push('https://github.com/gron1gh1')">깃헙</button>
         
         <input type="text"></input>
       </body>
@@ -91,7 +95,10 @@ function WebviewScreen({navigation}: ActivityProps) {
     <SafeAreaView style={{height: '100%'}}>
       <WebView
         ref={webViewRef}
-        source={{html}}
+        source={{
+          html: (route.params as any)?.url === '' ? html : undefined,
+          uri: (route.params as any)?.url,
+        }}
         onMessage={event => {
           BridgeListener.onMessage(JSON.parse(event.nativeEvent.data));
         }}
@@ -106,7 +113,7 @@ function WebviewScreen({navigation}: ActivityProps) {
       />
       <Button
         title="Go to Details... again"
-        onPress={() => navigation.push('Webview')}
+        onPress={() => navigation.push('Webview', {url: ''})}
       />
       {/* <NavigationContainer></NavigationContainer> */}
     </SafeAreaView>
