@@ -9,12 +9,51 @@
  */
 
 import React from 'react';
-import {SafeAreaView} from 'react-native';
+import {Button, SafeAreaView, Text, View} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {WebView} from 'react-native-webview';
 
 import BridgeListener from './bridge/listener';
+import {NavigationContainer} from '@react-navigation/native';
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+const Stack = createNativeStackNavigator();
+
+type RootStackParamList = {
+  Home: undefined;
+  Details: undefined;
+};
+type ActivityProps = NativeStackScreenProps<
+  RootStackParamList,
+  'Home',
+  'Details'
+>;
+
+function HomeScreen({navigation}: ActivityProps) {
+  return (
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Home Screen</Text>
+      <Button
+        title="Go to Details"
+        onPress={() => navigation.navigate('Details')}
+      />
+    </View>
+  );
+}
+function DetailsScreen({navigation}: ActivityProps) {
+  return (
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Details Screen</Text>
+      <Button
+        title="Go to Details... again"
+        onPress={() => navigation.push('Details')}
+      />
+    </View>
+  );
+}
 
 const App = () => {
   const backgroundStyle = {
@@ -53,24 +92,33 @@ const App = () => {
     `;
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <WebView
-        ref={webViewRef}
-        source={{html}}
-        onMessage={event => {
-          BridgeListener.onMessage(JSON.parse(event.nativeEvent.data));
-        }}
-        onContentProcessDidTerminate={syntheticEvent => {
-          const {nativeEvent} = syntheticEvent;
-          console.warn('Content process terminated, reloading', nativeEvent);
-
-          if (webViewRef.current) {
-            webViewRef.current.reload();
-          }
-        }}
-      />
-    </SafeAreaView>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Details" component={DetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
+  // return (
+  //   <SafeAreaView style={backgroundStyle}>
+  //     <WebView
+  //       ref={webViewRef}
+  //       source={{html}}
+  //       onMessage={event => {
+  //         BridgeListener.onMessage(JSON.parse(event.nativeEvent.data));
+  //       }}
+  //       onContentProcessDidTerminate={syntheticEvent => {
+  //         const {nativeEvent} = syntheticEvent;
+  //         console.warn('Content process terminated, reloading', nativeEvent);
+
+  //         if (webViewRef.current) {
+  //           webViewRef.current.reload();
+  //         }
+  //       }}
+  //     />
+  //     {/* <NavigationContainer></NavigationContainer> */}
+  //   </SafeAreaView>
+  // );
 };
 
 export default App;
