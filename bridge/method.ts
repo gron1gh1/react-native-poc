@@ -1,8 +1,13 @@
 import Clipboard from '@react-native-community/clipboard';
+import {createNavigationContainerRef} from '@react-navigation/native';
 import {Alert, Share, Linking} from 'react-native';
 import {InAppBrowser} from 'react-native-inappbrowser-reborn';
+import {StackActions} from '@react-navigation/native';
 
 // WebView <=> Native Communication
+
+export const navigationRef = createNavigationContainerRef();
+
 class BridgeMethod {
   async openLink(url: string) {
     try {
@@ -54,6 +59,17 @@ class BridgeMethod {
 
   clipboard(message: string) {
     Clipboard.setString(message);
+  }
+
+  navigate({name, params}: {name: never; params: never}) {
+    if (navigationRef.isReady()) {
+      navigationRef.navigate(name, params);
+    }
+  }
+  push({name, params}: {name: string; params?: object}) {
+    if (navigationRef.isReady()) {
+      navigationRef.dispatch(StackActions.push(name, params));
+    }
   }
 }
 

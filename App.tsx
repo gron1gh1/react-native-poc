@@ -11,7 +11,6 @@
 import React from 'react';
 import {Button, SafeAreaView, Text, View} from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {WebView} from 'react-native-webview';
 
 import BridgeListener from './bridge/listener';
@@ -20,16 +19,17 @@ import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
+import {navigationRef} from './bridge/method';
 const Stack = createNativeStackNavigator();
 
 type RootStackParamList = {
   Home: undefined;
-  Details: undefined;
+  Webview: undefined;
 };
 type ActivityProps = NativeStackScreenProps<
   RootStackParamList,
   'Home',
-  'Details'
+  'Webview'
 >;
 
 function HomeScreen({navigation}: ActivityProps) {
@@ -38,12 +38,12 @@ function HomeScreen({navigation}: ActivityProps) {
       <Text>Home Screen</Text>
       <Button
         title="Go to Details"
-        onPress={() => navigation.navigate('Details')}
+        onPress={() => navigation.navigate('Webview')}
       />
     </View>
   );
 }
-function DetailsScreen({navigation}: ActivityProps) {
+function WebviewScreen({navigation}: ActivityProps) {
   const webViewRef = React.useRef<WebView>(null);
 
   const html = `
@@ -64,11 +64,24 @@ function DetailsScreen({navigation}: ActivityProps) {
       function clipboard() {
         window.ReactNativeWebView.postMessage(JSON.stringify({method:"clipboard", data: "https://github.com/gron1gh1"}))
       }
+
+      function navigate() {
+        window.ReactNativeWebView.postMessage(JSON.stringify({method:"navigate", data:{name:'Home'}}))
+      }
+
+      function push() {
+        window.ReactNativeWebView.postMessage(JSON.stringify({method:"push", data:{name:'Webview'}}))
+      }
+
         </script>
         <h1>Hello World</h1>
         <button onclick="inapp()">인앱</button>
         <button onclick="share()">공유</button>
         <button onclick="clipboard()">복사</button>
+
+        <button onclick="navigate()">홈</button>
+        
+        <button onclick="push()">푸시</button>
         
         <input type="text"></input>
       </body>
@@ -93,7 +106,7 @@ function DetailsScreen({navigation}: ActivityProps) {
       />
       <Button
         title="Go to Details... again"
-        onPress={() => navigation.push('Details')}
+        onPress={() => navigation.push('Webview')}
       />
       {/* <NavigationContainer></NavigationContainer> */}
     </SafeAreaView>
@@ -102,10 +115,10 @@ function DetailsScreen({navigation}: ActivityProps) {
 
 const App = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="Webview" component={WebviewScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
