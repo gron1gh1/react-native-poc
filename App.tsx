@@ -8,7 +8,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Button, SafeAreaView, Text, View} from 'react-native';
 
 import {WebView} from 'react-native-webview';
@@ -47,6 +47,10 @@ function HomeScreen({navigation}: ActivityProps) {
 }
 function WebviewScreen({navigation, route}: ActivityProps) {
   const webViewRef = React.useRef<WebView>(null);
+
+  useEffect(() => {
+    navigation.setOptions({title: (Math.random() * 100).toFixed(0)});
+  }, [navigation]);
 
   const html = `
       <html>
@@ -113,7 +117,9 @@ function WebviewScreen({navigation, route}: ActivityProps) {
       />
       <Button
         title="Go to Details... again"
-        onPress={() => navigation.push('Webview', {url: ''})}
+        onPress={() => {
+          navigation.push('Webview', {url: ''});
+        }}
       />
       {/* <NavigationContainer></NavigationContainer> */}
     </SafeAreaView>
