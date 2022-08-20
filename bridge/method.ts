@@ -3,7 +3,7 @@ import {Alert, Share, Linking} from 'react-native';
 import {InAppBrowser} from 'react-native-inappbrowser-reborn';
 
 // WebView <=> Native Communication
-export class BridgeMethod {
+class BridgeMethod {
   async openLink(url: string) {
     try {
       if (await InAppBrowser.isAvailable()) {
@@ -57,4 +57,4 @@ export class BridgeMethod {
   }
 }
 
-export default new BridgeMethod();
+export default BridgeMethod;

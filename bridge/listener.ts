@@ -1,6 +1,6 @@
-import {BridgeMethod} from './method';
+import BridgeMethod from './method';
 type ObtainMethods<T> = {
-  [Prop in keyof T]: T[Prop] extends Fn ? Prop : never;
+  [Prop in keyof T]: T[Prop] extends Function ? Prop : never;
 }[keyof T];
 
 type Method = ObtainMethods<BridgeMethod>;
@@ -10,14 +10,11 @@ interface Message<T = any> {
   data: T;
 }
 
-class BridgeListener {
+class BridgeListener extends BridgeMethod {
   onMessage({method, data}: Message) {
     switch (method) {
-      case 'clipboard':
-        break;
-      case 'openLink':
-        break;
-      case 'share':
+      default:
+        this[method](data);
         break;
     }
   }
