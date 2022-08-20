@@ -44,22 +44,6 @@ function HomeScreen({navigation}: ActivityProps) {
   );
 }
 function DetailsScreen({navigation}: ActivityProps) {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Details Screen</Text>
-      <Button
-        title="Go to Details... again"
-        onPress={() => navigation.push('Details')}
-      />
-    </View>
-  );
-}
-
-const App = () => {
-  const backgroundStyle = {
-    backgroundColor: Colors.lighter,
-    height: '100%',
-  };
   const webViewRef = React.useRef<WebView>(null);
 
   const html = `
@@ -90,7 +74,33 @@ const App = () => {
       </body>
       </html>
     `;
+  return (
+    <SafeAreaView style={{height: '100%'}}>
+      <WebView
+        ref={webViewRef}
+        source={{html}}
+        onMessage={event => {
+          BridgeListener.onMessage(JSON.parse(event.nativeEvent.data));
+        }}
+        onContentProcessDidTerminate={syntheticEvent => {
+          const {nativeEvent} = syntheticEvent;
+          console.warn('Content process terminated, reloading', nativeEvent);
 
+          if (webViewRef.current) {
+            webViewRef.current.reload();
+          }
+        }}
+      />
+      <Button
+        title="Go to Details... again"
+        onPress={() => navigation.push('Details')}
+      />
+      {/* <NavigationContainer></NavigationContainer> */}
+    </SafeAreaView>
+  );
+}
+
+const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -99,26 +109,6 @@ const App = () => {
       </Stack.Navigator>
     </NavigationContainer>
   );
-  // return (
-  //   <SafeAreaView style={backgroundStyle}>
-  //     <WebView
-  //       ref={webViewRef}
-  //       source={{html}}
-  //       onMessage={event => {
-  //         BridgeListener.onMessage(JSON.parse(event.nativeEvent.data));
-  //       }}
-  //       onContentProcessDidTerminate={syntheticEvent => {
-  //         const {nativeEvent} = syntheticEvent;
-  //         console.warn('Content process terminated, reloading', nativeEvent);
-
-  //         if (webViewRef.current) {
-  //           webViewRef.current.reload();
-  //         }
-  //       }}
-  //     />
-  //     {/* <NavigationContainer></NavigationContainer> */}
-  //   </SafeAreaView>
-  // );
 };
 
 export default App;
