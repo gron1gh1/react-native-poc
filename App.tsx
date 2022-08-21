@@ -51,7 +51,7 @@ function HomeScreen({navigation}: ActivityProps) {
         onPress={() =>
           navigation.replace('Webview', {
             url: 'http://localhost:3000',
-            title: '홈',
+            title: '',
           })
         }
       />
@@ -173,7 +173,7 @@ function HeaderRight() {
             method: 'push',
             data: {
               name: 'Webview',
-              params: {url: 'http://localhost:3000/inbox', title: 'inbox'},
+              params: {url: 'http://localhost:3000/inbox', title: '인박스'},
             },
           })
         }
@@ -185,13 +185,21 @@ function HeaderRight() {
             method: 'push',
             data: {
               name: 'Webview',
-              params: {url: 'http://localhost:3000/closet', title: 'closet'},
+              params: {url: 'http://localhost:3000/closet', title: '옷장'},
             },
           })
         }
       />
     </View>
   );
+}
+
+function HeaderTitle({title}: {title: string}) {
+  const navigation = useNavigation();
+  if (!navigation.canGoBack()) {
+    return null;
+  }
+  return <Text style={{fontWeight: 'bold'}}>{title}</Text>;
 }
 
 const App = () => {
@@ -204,6 +212,7 @@ const App = () => {
           },
           headerLeft: () => <HeaderLeft />,
           headerRight: () => <HeaderRight />,
+          headerTitle: ({children}) => <HeaderTitle title={children} />,
           headerTintColor: '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',
