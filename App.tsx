@@ -14,11 +14,17 @@ import {Button, SafeAreaView, Text, View} from 'react-native';
 import {WebView} from 'react-native-webview';
 
 import BridgeListener from './bridge/listener';
-import {NavigationContainer} from '@react-navigation/native';
+import {
+  NavigationContainer,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
+
+import Logo from './assets/brandazine.svg';
 import {navigationRef} from './bridge/method';
 const Stack = createNativeStackNavigator();
 
@@ -36,10 +42,11 @@ function HomeScreen({navigation}: ActivityProps) {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>Home Screen</Text>
+      <Logo width={200} height={60} fill={'#000'} />
       <Button
         title="Go to Details"
         onPress={() =>
-          navigation.navigate('Webview', {
+          navigation.replace('Webview', {
             url: 'http://localhost:3000',
             title: '홈',
           })
@@ -118,6 +125,7 @@ function WebviewScreen({navigation, route}: ActivityProps) {
           }
         }}
       />
+
       <Button
         title="Go to Details... again"
         onPress={() => {
@@ -129,10 +137,33 @@ function WebviewScreen({navigation, route}: ActivityProps) {
   );
 }
 
+function HeaderLeft() {
+  const navigation = useNavigation();
+  return (
+    <>
+      {!navigation.canGoBack() ? (
+        <Logo width={130} height={20} fill={'#000'} />
+      ) : (
+        <Text onPress={() => navigation.goBack()}> {'이전'}</Text>
+      )}
+    </>
+  );
+}
+
 const App = () => {
   return (
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#FFF',
+          },
+          headerLeft: () => <HeaderLeft />,
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}>
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Webview" component={WebviewScreen} />
       </Stack.Navigator>
