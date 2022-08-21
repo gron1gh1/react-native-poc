@@ -9,16 +9,12 @@
  */
 
 import React, {useEffect, useMemo} from 'react';
-import {Button, SafeAreaView, Text, View} from 'react-native';
+import {SafeAreaView, Text, View} from 'react-native';
 
 import {WebView} from 'react-native-webview';
 
-import BridgeListener from './bridge/listener';
-import {
-  NavigationContainer,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import BridgeManager from './bridge/manager';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {
   createNativeStackNavigator,
   NativeStackScreenProps,
@@ -37,27 +33,10 @@ type RootStackParamList = {
 };
 type ActivityProps = NativeStackScreenProps<
   RootStackParamList,
-  'Webview',
-  'Home'
+  'Webview'
+  // 'Home'
 >;
 
-function HomeScreen({navigation}: ActivityProps) {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Home Screen</Text>
-      <Logo width={200} height={60} fill={'#000'} />
-      <Button
-        title="Go to Details"
-        onPress={() =>
-          navigation.replace('Webview', {
-            url: 'http://localhost:3000',
-            title: '',
-          })
-        }
-      />
-    </View>
-  );
-}
 function WebviewScreen({navigation, route}: ActivityProps) {
   const webViewRef = React.useRef<WebView>(null);
 
@@ -77,15 +56,16 @@ function WebviewScreen({navigation, route}: ActivityProps) {
           uri,
         }}
         onMessage={event => {
-          BridgeListener.onMessage(JSON.parse(event.nativeEvent.data));
+          BridgeManager.onMessage(JSON.parse(event.nativeEvent.data));
         }}
-        // onContentProcessDidTerminate={syntheticEvent => {
-        //   const {nativeEvent} = syntheticEvent;
-        //   console.warn('Content process terminated, reloading', nativeEvent);
-        //   if (webViewRef.current) {
-        //     webViewRef.current.reload();
-        //   }
-        // }}
+        injectedJavaScript={BridgeManager.injectionAuth()}
+        onContentProcessDidTerminate={syntheticEvent => {
+          const {nativeEvent} = syntheticEvent;
+          console.warn('Content process terminated, reloading', nativeEvent);
+          if (webViewRef.current) {
+            webViewRef.current.reload();
+          }
+        }}
       />
     </SafeAreaView>
   );
@@ -120,7 +100,7 @@ function HeaderRight() {
         height={20}
         style={{marginRight: 10}}
         onPress={() =>
-          BridgeListener.run({
+          BridgeManager.run({
             method: 'push',
             data: {
               name: 'Webview',
@@ -132,7 +112,7 @@ function HeaderRight() {
       <ClosetIcon
         height={20}
         onPress={() =>
-          BridgeListener.run({
+          BridgeManager.run({
             method: 'push',
             data: {
               name: 'Webview',

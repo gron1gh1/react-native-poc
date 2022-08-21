@@ -10,7 +10,7 @@ interface Message<T = any> {
   data: T;
 }
 
-class BridgeListener extends BridgeMethod {
+class BridgeManager extends BridgeMethod {
   onMessage({method, data}: Message) {
     switch (method) {
       default:
@@ -23,4 +23,4 @@ class BridgeListener extends BridgeMethod {
   }
 }
 
-export default new BridgeListener();
+export default new BridgeManager();

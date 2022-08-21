@@ -71,6 +71,13 @@ class BridgeMethod {
       navigationRef.dispatch(StackActions.push(name, params));
     }
   }
+
+  injectionAuth() {
+    const InjectedScript = `
+      window.localStorage.setItem("BZ_TOKEN", "TEST_TOKEN");
+    `;
+    return InjectedScript;
+  }
 }
 
 export default BridgeMethod;
