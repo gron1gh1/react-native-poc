@@ -24,12 +24,12 @@ const Stack = createNativeStackNavigator();
 
 type RootStackParamList = {
   Home: undefined;
-  Webview: {url: string};
+  Webview: {title: string; url: string};
 };
 type ActivityProps = NativeStackScreenProps<
   RootStackParamList,
-  'Home',
-  'Webview'
+  'Webview',
+  'Home'
 >;
 
 function HomeScreen({navigation}: ActivityProps) {
@@ -39,7 +39,10 @@ function HomeScreen({navigation}: ActivityProps) {
       <Button
         title="Go to Details"
         onPress={() =>
-          navigation.navigate('Webview', {url: 'http://google.com'})
+          navigation.navigate('Webview', {
+            url: 'http://localhost:3000',
+            title: '홈',
+          })
         }
       />
     </View>
@@ -49,8 +52,8 @@ function WebviewScreen({navigation, route}: ActivityProps) {
   const webViewRef = React.useRef<WebView>(null);
 
   useEffect(() => {
-    navigation.setOptions({title: (Math.random() * 100).toFixed(0)});
-  }, [navigation]);
+    navigation.setOptions({title: route.params.title});
+  }, [navigation, route]);
 
   const html = `
       <html>
@@ -118,7 +121,7 @@ function WebviewScreen({navigation, route}: ActivityProps) {
       <Button
         title="Go to Details... again"
         onPress={() => {
-          navigation.push('Webview', {url: ''});
+          navigation.push('Webview', {url: '', title: 'home'});
         }}
       />
       {/* <NavigationContainer></NavigationContainer> */}
