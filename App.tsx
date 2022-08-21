@@ -25,6 +25,9 @@ import {
 } from '@react-navigation/native-stack';
 
 import Logo from './assets/brandazine.svg';
+
+import InboxIcon from './assets/inbox-main-icon.svg';
+import ClosetIcon from './assets/closet2.svg';
 import {navigationRef} from './bridge/method';
 const Stack = createNativeStackNavigator();
 
@@ -140,13 +143,54 @@ function WebviewScreen({navigation, route}: ActivityProps) {
 function HeaderLeft() {
   const navigation = useNavigation();
   return (
-    <>
+    <View style={{marginBottom: 5}}>
       {!navigation.canGoBack() ? (
         <Logo width={130} height={20} fill={'#000'} />
       ) : (
         <Text onPress={() => navigation.goBack()}> {'이전'}</Text>
       )}
-    </>
+    </View>
+  );
+}
+
+function HeaderRight() {
+  const navigation = useNavigation();
+  if (navigation.canGoBack()) {
+    return null;
+  }
+  return (
+    <View
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        marginBottom: 5,
+      }}>
+      <InboxIcon
+        height={20}
+        style={{marginRight: 10}}
+        onPress={() =>
+          BridgeListener.run({
+            method: 'push',
+            data: {
+              name: 'Webview',
+              params: {url: 'http://localhost:3000/inbox', title: 'inbox'},
+            },
+          })
+        }
+      />
+      <ClosetIcon
+        height={20}
+        onPress={() =>
+          BridgeListener.run({
+            method: 'push',
+            data: {
+              name: 'Webview',
+              params: {url: 'http://localhost:3000/closet', title: 'closet'},
+            },
+          })
+        }
+      />
+    </View>
   );
 }
 
@@ -159,6 +203,7 @@ const App = () => {
             backgroundColor: '#FFF',
           },
           headerLeft: () => <HeaderLeft />,
+          headerRight: () => <HeaderRight />,
           headerTintColor: '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',

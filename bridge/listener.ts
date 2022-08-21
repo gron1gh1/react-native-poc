@@ -18,6 +18,9 @@ class BridgeListener extends BridgeMethod {
         break;
     }
   }
+  run({method, data}: Message) {
+    this[method](data);
+  }
 }
 
 export default new BridgeListener();
